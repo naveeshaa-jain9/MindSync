@@ -1,0 +1,23 @@
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Google calendar credentials
+credentials.json
+token.json
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+
+# Test/cache files
+.pytest_cache/
