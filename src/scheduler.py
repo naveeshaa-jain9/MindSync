@@ -361,20 +361,20 @@ def recommend_multiple_slots(
     earliest_start=None
 ):
     """
-    Assign non-overlapping slots to multiple recommendations.
+    assign non overlapping slots to multiple recommendations
 
-    The first recommendation receives the highest-scoring
-    available slot.
+    the first recommendation receives the highest-scoring
+    available slot!!
 
-    Later recommendations prefer a genuinely separate recovery
+    later recommendations prefer a genuinely separate recovery
     opportunity rather than being scheduled immediately beside
-    an existing wellbeing activity.
+    an existing wellbeing activity
 
-    If no separate slot exists for a later recommendation,
-    that recommendation is returned without a slot.
+    if no separate slot exists for a later recommendation,
+    that recommendation is returned without a slot
 
-    If earliest_start is provided, no recommendation will be
-    scheduled before that time.
+    if earliest_start is provided, no recommendation will be
+    scheduled before that time
     """
 
     scheduled = []
@@ -406,14 +406,14 @@ def recommend_multiple_slots(
 
         chosen_slot = None
 
-        # The first recommendation simply receives
-        # the best available candidate.
+        #the first recommendation simply receives
+        # the best available candidate
         if not chosen_intervals:
             chosen_slot = candidates[0]
 
         else:
-            # Later recommendations must preferably use
-            # a separate, non-adjacent recovery opportunity.
+            #later,recommendations must preferably use
+            # a separate, nonadjacent recovery opportunity
             for candidate in candidates:
                 candidate_start = time_to_minutes(
                     candidate["start"]
@@ -448,8 +448,8 @@ def recommend_multiple_slots(
                     chosen_slot = candidate
                     break
 
-        # Do not force a secondary intervention into
-        # an adjacent slot if no separate opportunity exists.
+        #dont force a secondary intervention into
+        # an adjacent slot if no separate opportunity exists
         if chosen_slot is None:
             scheduled.append(
                 {
@@ -460,8 +460,8 @@ def recommend_multiple_slots(
 
             continue
 
-        # IMPORTANT:
-        # Append the successfully scheduled recommendation.
+        
+        #append the successfully scheduled recommendation
         scheduled.append(
             {
                 "recommendation": recommendation,
@@ -484,8 +484,8 @@ def recommend_multiple_slots(
             )
         )
 
-        # Temporarily reserve the wellbeing intervention
-        # so later recommendations cannot overlap it.
+        #temp reserve the wellbeing intervention
+        # so later recommendations cannot overlap it
         temporary_events.append(
             {
                 "title": recommendation["activity"],

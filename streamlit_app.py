@@ -357,7 +357,7 @@ def main():
         if item.get("slot") is not None
     ]
 
-    # ---------------- SIDEBAR ----------------
+    # -------sidebar---------
 
     with st.sidebar:
         st.markdown("## 🧠 MindSync")
@@ -412,7 +412,7 @@ def main():
             "pressure and does not provide a clinical diagnosis."
         )
 
-    # ---------------- HERO ----------------
+    # ---------hero------------
 
     hero_html = dedent(
         """
@@ -456,7 +456,7 @@ def main():
             f"**Analysed date:** {calendar['date']}"
         )
 
-    # ---------------- OVERVIEW ----------------
+    # --------overview-------------
 
     st.markdown(
         '<div class="section-heading">'
@@ -505,7 +505,7 @@ def main():
 
     st.write("")
 
-    # ---------------- RISK ANALYSIS ----------------
+    # -----------risk analysis------------
 
     st.markdown(
         '<div class="section-heading">'
@@ -566,7 +566,7 @@ def main():
                 score / 100
             )
 
-    # ---------------- EXPLAINABILITY ----------------
+    # --------explainability-------------
 
     st.markdown(
         '<div class="section-heading">'
@@ -618,7 +618,7 @@ def main():
                         f"• {reason}"
                     )
 
-    # ---------------- RECOMMENDATIONS ----------------
+    # ----------recommendations------------
 
     st.markdown(
         '<div class="section-heading">'
@@ -736,7 +736,7 @@ def main():
             "into the remaining analysed workday."
         )
 
-    # ---------------- CALENDAR ----------------
+    # -------calendar-----------
 
     st.markdown(
         '<div class="section-heading">'
@@ -760,7 +760,7 @@ def main():
                 event
             )
 
-    # ---------------- TECHNICAL DETAILS ----------------
+    # ------------tech details-----------
 
     st.write("")
 
