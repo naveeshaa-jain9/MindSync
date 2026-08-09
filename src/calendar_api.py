@@ -96,6 +96,13 @@ def fetch_calendar_events(
 
     now = datetime.now().astimezone()
 
+    start_time = now.replace(
+    hour=0,
+    minute=0,
+    second=0,
+    microsecond=0,
+    )
+
     end_time = (
         now
         + timedelta(days=days_ahead)
@@ -105,7 +112,7 @@ def fetch_calendar_events(
         service.events()
         .list(
             calendarId="primary",
-            timeMin=now.isoformat(),
+            timeMin=start_time.isoformat(),
             timeMax=end_time.isoformat(),
             maxResults=max_results,
             singleEvents=True,
