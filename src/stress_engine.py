@@ -15,7 +15,15 @@ def density_heuristic(features):
     the thresholds are prototype design choices intended to
     operationalise calendar workload into an interpretable score
     """
-
+    if features["workload_event_count"] == 0:
+        return {
+            "name": "Workload Density",
+            "score": 0,
+            "reasons": [
+                "No workload events are scheduled in the analysed workday."
+            ],
+        }
+    
     workload_density = features["workload_density"]
     meeting_density = features["meeting_density"]
 
@@ -70,7 +78,15 @@ def recovery_heuristic(features):
     estimates pressure caused by consecutive workload events,
     short opportunities for recovery and limited explicit breaks
     """
-
+    if features["workload_event_count"] == 0:
+        return {
+            "name": "Recovery Pressure",
+            "score": 0,
+            "reasons": [
+                "No workload is scheduled, so no additional recovery pressure is detected."
+            ],
+        }
+    
     score = 0
     reasons = []
 
