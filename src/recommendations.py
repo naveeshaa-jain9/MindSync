@@ -15,6 +15,9 @@ def generate_recommendations(features, risk):
 
     # ---------recovery pressure-------------
 
+    back_to_back = features["back_to_back_workload_count"]
+    recovery_minutes = features["total_recovery_minutes"]
+
     if recovery_score >= 60:
         recommendations.append(
             {
@@ -28,19 +31,36 @@ def generate_recommendations(features, risk):
             }
         )
 
-    elif recovery_score >= 30:
+    elif recovery_score >= 30 and back_to_back > 0:
         recommendations.append(
             {
                 "activity": "Short Recovery Break",
                 "duration_minutes": 10,
                 "priority": "Medium",
                 "reason": (
-                    "The schedule contains some consecutive workload "
-                    "and would benefit from an additional recovery period."
+                    "The schedule contains consecutive workload "
+                    "activities and would benefit from an additional "
+                    "recovery period."
                 ),
             }
         )
 
+    elif (
+        recovery_score >= 20
+        and back_to_back == 0
+        and recovery_minutes == 0
+    ):
+        recommendations.append(
+            {
+                "activity": "Preventative Recovery Break",
+                "duration_minutes": 5,
+                "priority": "Low",
+                "reason": (
+                    "The current schedule is relatively light, "
+                    "but no explicit recovery  period is scheduled."
+                ),
+            }
+        )
     # ---------context switching-------------
 
     if context_score >= 70:
