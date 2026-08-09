@@ -361,13 +361,20 @@ def recommend_multiple_slots(
     earliest_start=None
 ):
     """
-    assign non-overlapping slots to multiple recommendations
+    Assign non-overlapping slots to multiple recommendations.
 
-    where possible, later recommendations are placed in a
-    different free window from earlier recommendations
+    The first recommendation receives the highest-scoring
+    available slot.
 
-    if earliest_start is provided, no recommendation will be
-    scheduled before that time
+    Later recommendations prefer a genuinely separate recovery
+    opportunity rather than being scheduled immediately beside
+    an existing wellbeing activity.
+
+    If no separate slot exists for a later recommendation,
+    that recommendation is returned without a slot.
+
+    If earliest_start is provided, no recommendation will be
+    scheduled before that time.
     """
 
     scheduled = []
@@ -376,7 +383,7 @@ def recommend_multiple_slots(
         events
     )
 
-    used_windows = set()
+    chosen_intervals = []
 
     for recommendation in recommendations:
         candidates = get_candidate_slots(
@@ -390,11 +397,8 @@ def recommend_multiple_slots(
         if not candidates:
             scheduled.append(
                 {
-                    "recommendation":
-                        recommendation,
-
-                    "slot":
-                        None,
+                    "recommendation": recommendation,
+                    "slot": None,
                 }
             )
 
@@ -402,70 +406,99 @@ def recommend_multiple_slots(
 
         chosen_slot = None
 
-        for candidate in candidates:
-            window_key = (
-                candidate[
-                    "available_window_start"
-                ],
-                candidate[
-                    "available_window_end"
-                ],
-            )
+        # The first recommendation simply receives
+        # the best available candidate.
+        if not chosen_intervals:
+            chosen_slot = candidates[0]
 
-            if (
-                window_key
-                not in used_windows
-            ):
-                chosen_slot = candidate
-
-                used_windows.add(
-                    window_key
+        else:
+            # Later recommendations must preferably use
+            # a separate, non-adjacent recovery opportunity.
+            for candidate in candidates:
+                candidate_start = time_to_minutes(
+                    candidate["start"]
                 )
 
-                break
+                candidate_end = time_to_minutes(
+                    candidate["end"]
+                )
 
+                separate = True
+
+                for (
+                    previous_start,
+                    previous_end
+                ) in chosen_intervals:
+
+                    overlaps = (
+                        candidate_start < previous_end
+                        and candidate_end > previous_start
+                    )
+
+                    adjacent = (
+                        candidate_start == previous_end
+                        or candidate_end == previous_start
+                    )
+
+                    if overlaps or adjacent:
+                        separate = False
+                        break
+
+                if separate:
+                    chosen_slot = candidate
+                    break
+
+        # Do not force a secondary intervention into
+        # an adjacent slot if no separate opportunity exists.
         if chosen_slot is None:
-            chosen_slot = (
-                candidates[0]
+            scheduled.append(
+                {
+                    "recommendation": recommendation,
+                    "slot": None,
+                }
             )
 
+            continue
+
+        # IMPORTANT:
+        # Append the successfully scheduled recommendation.
         scheduled.append(
             {
-                "recommendation":
-                    recommendation,
-
-                "slot":
-                    chosen_slot,
+                "recommendation": recommendation,
+                "slot": chosen_slot,
             }
         )
 
+        chosen_start = time_to_minutes(
+            chosen_slot["start"]
+        )
+
+        chosen_end = time_to_minutes(
+            chosen_slot["end"]
+        )
+
+        chosen_intervals.append(
+            (
+                chosen_start,
+                chosen_end,
+            )
+        )
+
+        # Temporarily reserve the wellbeing intervention
+        # so later recommendations cannot overlap it.
         temporary_events.append(
             {
-                "title":
-                    recommendation[
-                        "activity"
-                    ],
-
-                "start":
-                    chosen_slot[
-                        "start"
-                    ],
-
-                "end":
-                    chosen_slot[
-                        "end"
-                    ],
-
-                "type":
-                    "wellbeing",
+                "title": recommendation["activity"],
+                "start": chosen_slot["start"],
+                "end": chosen_slot["end"],
+                "type": "wellbeing",
             }
         )
 
         temporary_events.sort(
-            key=lambda event:
-                time_to_minutes(
-                    event["start"]
-                )
+            key=lambda event: time_to_minutes(
+                event["start"]
+            )
         )
 
     return scheduled

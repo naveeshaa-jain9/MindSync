@@ -164,23 +164,11 @@ CUSTOM_CSS = """
     opacity: 0.65;
 }
 
-div[data-testid="stProgress"] > div > div > div > div {
-    border-radius: 999px;
-}
-
 </style>
 """
 
 
 def load_calendar_data():
-    """
-    Load live Google Calendar data where possible.
-
-    If no usable timed events are found for today, or if
-    Google Calendar cannot be accessed, use the bundled
-    JSON sample calendar instead.
-    """
-
     today = date.today().isoformat()
 
     try:
@@ -363,6 +351,12 @@ def main():
         )
     )
 
+    display_recommendations = [
+        item
+        for item in scheduled_recommendations
+        if item.get("slot") is not None
+    ]
+
     # ---------------- SIDEBAR ----------------
 
     with st.sidebar:
@@ -386,9 +380,13 @@ def main():
             )
 
         st.markdown("### Analysed Date")
-
         st.write(
             calendar["date"]
+        )
+
+        st.markdown("### Analysis Window")
+        st.write(
+            "09:00 – 17:00"
         )
 
         st.divider()
@@ -430,7 +428,9 @@ def main():
         """
     )
 
-    st.html(hero_html)
+    st.html(
+        hero_html
+    )
 
     source_col, date_col = st.columns(
         [2, 1]
@@ -545,7 +545,9 @@ def main():
             """
         )
 
-        st.html(risk_html)
+        st.html(
+            risk_html
+        )
 
     with heuristics_col:
         for heuristic in risk[
@@ -625,101 +627,99 @@ def main():
         unsafe_allow_html=True,
     )
 
-    for index, item in enumerate(
-        scheduled_recommendations,
-        start=1
-    ):
-        recommendation = (
-            item[
-                "recommendation"
+    if display_recommendations:
+        for index, item in enumerate(
+            display_recommendations,
+            start=1
+        ):
+            recommendation = (
+                item[
+                    "recommendation"
+                ]
+            )
+
+            slot = item[
+                "slot"
             ]
-        )
 
-        slot = item[
-            "slot"
-        ]
+            if index == 1:
+                card_class = (
+                    "recommendation-card "
+                    "primary-card"
+                )
 
-        if index == 1:
-            card_class = (
-                "recommendation-card "
-                "primary-card"
+                label = (
+                    "Primary Recommendation"
+                )
+
+            else:
+                card_class = (
+                    "recommendation-card "
+                    "secondary-card"
+                )
+
+                label = (
+                    "Secondary Recommendation"
+                )
+
+            slot_text = (
+                f"{slot['start']} – "
+                f"{slot['end']}"
             )
 
-            label = (
-                "Primary Recommendation"
-            )
+            recommendation_html = dedent(
+                f"""
+                <div class="{card_class}">
+                    <div class="rec-label">
+                        {label}
+                    </div>
 
-        else:
-            card_class = (
-                "recommendation-card "
-                "secondary-card"
-            )
+                    <div class="rec-title">
+                        {recommendation['activity']}
+                    </div>
 
-            label = (
-                "Secondary Recommendation"
-            )
+                    <div style="
+                        display:flex;
+                        gap:2.5rem;
+                        margin-top:0.7rem;
+                        margin-bottom:0.7rem;
+                    ">
+                        <div>
+                            <div class="small-muted">
+                                Duration
+                            </div>
 
-        slot_text = (
-            f"{slot['start']} – "
-            f"{slot['end']}"
-            if slot
-            else "No suitable slot found"
-        )
-
-        recommendation_html = dedent(
-            f"""
-            <div class="{card_class}">
-                <div class="rec-label">
-                    {label}
-                </div>
-
-                <div class="rec-title">
-                    {recommendation['activity']}
-                </div>
-
-                <div style="
-                    display:flex;
-                    gap:2.5rem;
-                    margin-top:0.7rem;
-                    margin-bottom:0.7rem;
-                ">
-                    <div>
-                        <div class="small-muted">
-                            Duration
+                            <b>
+                                {recommendation['duration_minutes']} min
+                            </b>
                         </div>
 
-                        <b>
-                            {recommendation['duration_minutes']} min
-                        </b>
+                        <div>
+                            <div class="small-muted">
+                                Priority
+                            </div>
+
+                            <b>
+                                {recommendation['priority']}
+                            </b>
+                        </div>
                     </div>
 
                     <div>
-                        <div class="small-muted">
-                            Priority
-                        </div>
+                        {recommendation['reason']}
+                    </div>
 
-                        <b>
-                            {recommendation['priority']}
-                        </b>
+                    <div class="time-pill">
+                        Suggested time: {slot_text}
                     </div>
                 </div>
+                """
+            )
 
-                <div>
-                    {recommendation['reason']}
-                </div>
+            st.html(
+                recommendation_html
+            )
 
-                <div class="time-pill">
-                    Suggested time: {slot_text}
-                </div>
-            </div>
-            """
-        )
-
-        st.html(
-            recommendation_html
-        )
-
-        if slot:
             with st.expander(
                 "Why this time was selected"
             ):
@@ -729,6 +729,12 @@ def main():
                     st.write(
                         f"• {reason}"
                     )
+
+    else:
+        st.info(
+            "No additional recovery intervention can be fitted "
+            "into the remaining analysed workday."
+        )
 
     # ---------------- CALENDAR ----------------
 
