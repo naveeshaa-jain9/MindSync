@@ -1,0 +1,53 @@
+{
+  "date": "2026-08-10",
+  "events": [
+    {
+      "title": "Team Stand-up",
+      "start": "09:00",
+      "end": "09:30",
+      "type": "meeting"
+    },
+    {
+      "title": "Project Planning",
+      "start": "09:30",
+      "end": "10:30",
+      "type": "meeting"
+    },
+    {
+      "title": "Programming Session",
+      "start": "10:45",
+      "end": "12:00",
+      "type": "focused_work"
+    },
+    {
+      "title": "Client Meeting",
+      "start": "12:00",
+      "end": "13:00",
+      "type": "meeting"
+    },
+    {
+      "title": "Lunch",
+      "start": "13:00",
+      "end": "13:30",
+      "type": "break"
+    },
+    {
+      "title": "University Lecture",
+      "start": "13:30",
+      "end": "14:30",
+      "type": "lecture"
+    },
+    {
+      "title": "Group Project Meeting",
+      "start": "14:30",
+      "end": "15:30",
+      "type": "meeting"
+    },
+    {
+      "title": "Report Writing",
+      "start": "16:00",
+      "end": "17:00",
+      "type": "focused_work"
+    }
+  ]
+}
